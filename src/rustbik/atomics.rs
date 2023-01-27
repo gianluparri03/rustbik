@@ -1,9 +1,5 @@
-use strum_macros::EnumIter;
-
-
-// Colors definition
+#[derive(Copy, Clone)]
 pub enum Color { Yellow, White, Red, Orange, Green, Blue }
 
-// Faces definition
-#[derive(Eq, PartialEq, Hash, EnumIter)]
-pub enum Face { Up, Down, Back, Front, Left, Right }
+#[derive(Copy, Clone, Eq, PartialEq, Hash)]
+pub enum Face { Up, Down, Front, Back, Left, Right }
