@@ -1,28 +1,51 @@
 use crate::rustbik::atomics::*;
 
 
-#[derive(Default, Copy, Clone)]
+#[derive(Default, Debug, Copy, Clone)]
 pub struct Piece {
-    up: Option<Color>,
-    down: Option<Color>,
-    front: Option<Color>,
-    back: Option<Color>,
-    left: Option<Color>,
-    right: Option<Color>,
+    u: Option<Color>,
+    d: Option<Color>,
+    f: Option<Color>,
+    b: Option<Color>,
+    l: Option<Color>,
+    r: Option<Color>,
 }
 
 impl Piece {
-    // Puts a color in a face
-    fn set_color(&mut self, f: Face, c: Color) {
+    // Gets the color of a face as a mutable reference
+    fn get_color_mut(&mut self, f: Face) -> &mut Option<Color> {
         match f {
-            Face::Up => { self.up = Some(c); },
-            Face::Down => { self.down = Some(c); },
-            Face::Front => { self.front = Some(c); },
-            Face::Back => { self.back = Some(c); },
-            Face::Left => { self.left = Some(c); },
-            Face::Right => { self.right = Some(c); },
+            Face::U => &mut self.u,
+            Face::D => &mut self.d,
+            Face::F => &mut self.f,
+            Face::B => &mut self.b,
+            Face::L => &mut self.l,
+            Face::R => &mut self.r,
         }
     }
+
+    // Gets the color of a face as a reference
+    pub fn get_color(&self, f: Face) -> &Option<Color> {
+        match f {
+            Face::U => &self.u,
+            Face::D => &self.d,
+            Face::F => &self.f,
+            Face::B => &self.b,
+            Face::L => &self.l,
+            Face::R => &self.r,
+        }
+    }
+
+    // Puts a color in a face
+    fn set_color(&mut self, f: Face, c: Color) {
+        *self.get_color_mut(f) = Some(c);
+    }
+}
+
+
+// Creates a void piece (no colors)
+pub fn new_void() -> Piece {
+    Piece{..Default::default()}
 }
 
 
