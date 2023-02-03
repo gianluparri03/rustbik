@@ -1,76 +1,62 @@
 use crate::rustbik::atomics::*;
 
 
-#[derive(Default, Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct Piece {
-    u: Option<Color>,
-    d: Option<Color>,
-    f: Option<Color>,
-    b: Option<Color>,
-    l: Option<Color>,
-    r: Option<Color>,
+    colors: [Option<Color>; FACES_N],
 }
 
 impl Piece {
-    // Gets the color of a face as a mutable reference
-    fn get_color_mut(&mut self, f: Face) -> &mut Option<Color> {
-        match f {
-            Face::U => &mut self.u,
-            Face::D => &mut self.d,
-            Face::F => &mut self.f,
-            Face::B => &mut self.b,
-            Face::L => &mut self.l,
-            Face::R => &mut self.r,
+    // Creates a new piece without any colors
+    pub fn new() -> Piece { Piece{colors: [None, None, None, None, None, None]} }
+
+    // Gets or sets the color of a face
+    pub fn get_color(&self, f: Face) -> &Option<Color> { &self.colors[f as usize] }
+    pub fn set_color(&mut self, f: Face, c: Option<Color>) { self.colors[f as usize] = c; }
+
+    // Rotates the piece
+    pub fn rotate(&mut self, a: Axis, prime: bool, double: bool) {
+        // Calculates the cycle
+        let mut cycle: [Face; 4] = match a {
+            Axis::X => [Face::D, Face::B, Face::U, Face::F],
+            Axis::Y => [Face::L, Face::F, Face::R, Face::B],
+            Axis::Z => [Face::R, Face::U, Face::L, Face::D],
+        };
+
+        if double {
+            let a = cycle[0] as usize;
+            let b = cycle[1] as usize;
+            let c = cycle[2] as usize;
+            let d = cycle[3] as usize;
+
+            // Swaps two pairs of opposites
+            (self.colors[a], self.colors[b]) = (self.colors[b], self.colors[a]);
+            (self.colors[c], self.colors[d]) = (self.colors[d], self.colors[c]);
+        } else {
+            // If it's prime reverses the cycle
+            if prime { cycle.reverse(); }
+
+            // Swaps the colors
+            let backup = self.colors[cycle[0] as usize];
+            for i in 0..3 {
+                self.colors[cycle[i % 4] as usize] = self.colors[cycle[(i + 1) % 4] as usize];
+            }
+            self.colors[cycle[3] as usize] = backup;
         }
     }
+}
 
-    // Gets the color of a face as a reference
-    pub fn get_color(&self, f: Face) -> &Option<Color> {
-        match f {
-            Face::U => &self.u,
-            Face::D => &self.d,
-            Face::F => &self.f,
-            Face::B => &self.b,
-            Face::L => &self.l,
-            Face::R => &self.r,
-        }
+
+pub struct PiecesGroup<'a> {
+    pieces: Vec<&'a Piece>,
+}
+
+impl<'a> PiecesGroup<'a> {
+    pub fn new(v: Vec<&Piece>) -> PiecesGroup {
+        PiecesGroup{pieces: v}
     }
 
-    // Puts a color in a face
-    fn set_color(&mut self, f: Face, c: Color) {
-        *self.get_color_mut(f) = Some(c);
+    pub fn push(&mut self, p: &'a Piece) {
+        self.pieces.push(p);
     }
-}
-
-
-// Creates a void piece (no colors)
-pub fn new_void() -> Piece {
-    Piece{..Default::default()}
-}
-
-
-// Creates a center (only a color)
-pub fn new_center(f1: Face, c1: Color) -> Piece {
-    let mut p = Piece{..Default::default()};
-    p.set_color(f1, c1);
-    p
-}
-
-// Creates an edge (two colors)
-pub fn new_edge(f1: Face, c1: Color, f2: Face, c2: Color) -> Piece {
-    let mut p = Piece{..Default::default()};
-    // TODO: ensure faces are adjacent
-    p.set_color(f1, c1);
-    p.set_color(f2, c2);
-    p
-}
-
-// Creates a corner (three colors)
-pub fn new_corner(f1: Face, c1: Color, f2: Face, c2: Color, f3: Face, c3: Color) -> Piece {
-    let mut p = Piece{..Default::default()};
-    // TODO: ensure faces are adjacent
-    p.set_color(f1, c1);
-    p.set_color(f2, c2);
-    p.set_color(f3, c3);
-    p
 }

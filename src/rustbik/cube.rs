@@ -7,83 +7,42 @@ pub struct Cube {
 }
 
 impl Cube {
-    pub fn get_face(&self, f: Face) -> [&Option<Color>; 9] {
-        let mut view: [&Option<Color>; 9] = [&None; 9];
+    // Creates a new cube
+    pub fn new() -> Cube {
+        let mut c = Cube{pieces: [[[Piece::new(); 3]; 3]; 3]};
 
-        // Picks the right pieces in the right position
+        // Colors the faces
         for i in 0..3 {
             for j in 0..3 {
-                match f {
-                    Face::U => { view[i*3 + j] = self.pieces[0][i][j].get_color(f); },
-                    Face::D => { view[i*3 + j] = self.pieces[2][i][2 - j].get_color(f); },
-                    Face::B => { view[i*3 + j] = self.pieces[i][0][2 - j].get_color(f); },
-                    Face::F => { view[i*3 + j] = self.pieces[i][2][j].get_color(f); },
-                    Face::L => { view[i*3 + j] = self.pieces[i][j][0].get_color(f); },
-                    Face::R => { view[i*3 + j] = self.pieces[i][2 - j][2].get_color(f); },
-                }
+                c.pieces[0][i][j].set_color(Face::U, Some(Color::Yellow));
+                c.pieces[2][i][j].set_color(Face::D, Some(Color::White));
+                c.pieces[i][0][j].set_color(Face::B, Some(Color::Red));
+                c.pieces[i][2][j].set_color(Face::F, Some(Color::Orange));
+                c.pieces[i][j][0].set_color(Face::L, Some(Color::Green));
+                c.pieces[i][j][2].set_color(Face::R, Some(Color::Blue));
             }
         }
 
-        view
+        c
     }
-}
 
+    pub fn get_face(&self, f: Face) -> PiecesGroup {
+        let mut pg = PiecesGroup::new(vec![]);
 
-// Creates a new, solved cube
-pub fn new_cube() -> Cube {
-    Cube{pieces: [
-        [
-            [
-                new_corner(Face::U, Color::Yellow, Face::B, Color::Red, Face::L, Color::Green),
-                new_edge(Face::U, Color::Yellow, Face::B, Color::Red),
-                new_corner(Face::U, Color::Yellow, Face::B, Color::Red, Face::R, Color::Blue),
-            ],
-            [
-                new_edge(Face::U, Color::Yellow, Face::L, Color::Green),
-                new_center(Face::U, Color::Yellow),
-                new_edge(Face::U, Color::Yellow, Face::R, Color::Blue),
-            ],
-            [
-                new_corner(Face::U, Color::Yellow, Face::F, Color::Orange, Face::L, Color::Green),
-                new_edge(Face::U, Color::Yellow, Face::F, Color::Orange),
-                new_corner(Face::U, Color::Yellow, Face::F, Color::Orange, Face::R, Color::Blue),
-            ],
-        ],
+        // Adds all the pieces of that face to the group in order
+        for i in 0..3 {
+            for j in 0..3 {
+                pg.push(match f {
+                    Face::U => &self.pieces[0][i][j],
+                    Face::D => &self.pieces[2][i][2-j],
+                    Face::B => &self.pieces[i][0][2-j],
+                    Face::F => &self.pieces[i][2][j],
+                    Face::L => &self.pieces[i][j][0],
+                    Face::R => &self.pieces[i][2-j][2],
+                });
+            }
+        }
 
-        [
-            [
-                new_edge(Face::B, Color::Red, Face::L, Color::Green),
-                new_center(Face::B, Color::Red),
-                new_edge(Face::B, Color::Red, Face::R, Color::Blue),
-            ],
-            [
-                new_center(Face::L, Color::Green),
-                new_void(),
-                new_center(Face::R, Color::Blue),
-            ],
-            [
-                new_edge(Face::F, Color::Orange, Face::L, Color::Green),
-                new_center(Face::F, Color::Orange),
-                new_edge(Face::F, Color::Orange, Face::R, Color::Blue),
-            ],
-        ],
-
-        [
-            [
-                new_corner(Face::D, Color::White, Face::B, Color::Red, Face::L, Color::Green),
-                new_edge(Face::D, Color::White, Face::B, Color::Red),
-                new_corner(Face::D, Color::White, Face::B, Color::Red, Face::R, Color::Blue),
-            ],
-            [
-                new_edge(Face::D, Color::White, Face::L, Color::Green),
-                new_center(Face::D, Color::White),
-                new_edge(Face::D, Color::White, Face::R, Color::Blue),
-            ],
-            [
-                new_corner(Face::D, Color::White, Face::F, Color::Orange, Face::L, Color::Green),
-                new_edge(Face::D, Color::White, Face::F, Color::Orange),
-                new_corner(Face::D, Color::White, Face::F, Color::Orange, Face::R, Color::Blue),
-            ],
-        ],
-    ]}
+        pg
+    }
 }
