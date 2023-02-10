@@ -8,7 +8,7 @@
 
 - I wasn't working on any project
 
-And, before you ask: yes. I could have write something in a better way. The reason why I didn't might be one of the following:
+And, before you ask: yes. I could have written something in a better way. The reason why I didn't might be one of the following:
 
 - I am a beginner Rustacean: maybe I didn't know it was possibile
 

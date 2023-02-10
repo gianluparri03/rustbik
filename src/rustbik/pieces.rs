@@ -3,16 +3,16 @@ use crate::rustbik::atomics::*;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Piece {
-    colors: [Option<Color>; FACES_N],
+    colors: [Color; FACES_N],
 }
 
 impl Piece {
     // Creates a new piece without any colors
-    pub fn new() -> Piece { Piece{colors: [None, None, None, None, None, None]} }
+    pub fn new() -> Piece { Piece{colors: [Color::None, Color::None, Color::None, Color::None, Color::None, Color::None]} }
 
     // Gets or sets the color of a face
-    pub fn get_color(&self, f: Face) -> &Option<Color> { &self.colors[f as usize] }
-    pub fn set_color(&mut self, f: Face, c: Option<Color>) { self.colors[f as usize] = c; }
+    pub fn get_color(&self, f: Face) -> &Color { &self.colors[f as usize] }
+    pub fn set_color(&mut self, f: Face, c: Color) { self.colors[f as usize] = c; }
 
     // Rotates the piece
     pub fn rotate(&mut self, a: Axis, prime: bool, double: bool) {
@@ -43,20 +43,5 @@ impl Piece {
             }
             self.colors[cycle[3] as usize] = backup;
         }
-    }
-}
-
-
-pub struct PiecesGroup<'a> {
-    pieces: Vec<&'a Piece>,
-}
-
-impl<'a> PiecesGroup<'a> {
-    pub fn new(v: Vec<&Piece>) -> PiecesGroup {
-        PiecesGroup{pieces: v}
-    }
-
-    pub fn push(&mut self, p: &'a Piece) {
-        self.pieces.push(p);
     }
 }
